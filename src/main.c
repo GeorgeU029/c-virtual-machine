@@ -1,20 +1,12 @@
-#include <stdbool.h> 
+#include <stdio.h>
+#include "mac.h"
 
-
-int ip = 0; // Instruction pointer
-int sp = -1; //Stack pointer
-int stack[256];
-
+// Global variable definitions
+int stack[STACK_SIZE];
 bool running = true;
+int registers[NUM_OF_REGISTERS];
 
-typedef enum {
-    PSH,
-    ADD,
-    POP,
-    SET,
-    HLT
-} InstructionSet;
-
+// Program definition
 const int program[] = {
     PSH, 5,
     PSH, 6,
@@ -22,6 +14,7 @@ const int program[] = {
     POP,
     HLT
 };
+
 void eval(int instr) {
     switch (instr) {
         case HLT: {
@@ -33,16 +26,30 @@ void eval(int instr) {
             stack[sp] = program[++ip];
             break;
         }
+        case POP: {
+            int val_popped = stack[sp--];
+            printf("popped %d\n", val_popped);
+            break;
+        }
+        case ADD: {
+            int a = stack[sp--];
+            int b = stack[sp--];      
+            int result = b + a;
+            sp++; 
+            stack[sp] = result; 
+            break;
+        }
     }
 }
-int fetch(){
+
+int fetch(void) {
     return program[ip];
 }
-int main(){
-    while (running){
+
+int main() {
+    while (running) {
         eval(fetch());
         ip++;
     }
-    int instr = program[ip];
     return 0;
 }
